@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCEL DATA ADVENTURE - Misi Menjadi Ahli Analisis Data</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+    <div id="app" class="flex flex-col min-h-screen">
+        <!-- Top Navbar -->
+        <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-emerald-500 text-slate-950 p-2.5 rounded-xl font-extrabold flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <i data-lucide="database" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg text-white tracking-wide">EXCEL DATA ADVENTURE</h1>
+                    <p class="text-xs text-slate-400 font-medium">Informatika Kelas 8 SMP — Bab Analisis Data</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="bg-slate-800/80 border border-slate-700/60 px-4 py-2 rounded-2xl flex items-center space-x-3">
+                    <div class="flex items-center space-x-1.5 text-amber-400 font-bold">
+                        <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+                        <span>{{ totalPoints }} XP</span>
+                    </div>
+                    <div class="h-4 w-[1px] bg-slate-700"></div>
+                    <div class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                        Level {{ currentLevel }}
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar Navigation -->
+            <aside class="w-72 bg-slate-950/60 border-r border-slate-800/80 p-4 flex flex-col space-y-2 overflow-y-auto">
+                <div class="px-3 py-2 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Navigasi Misi</div>
+                
+                <button @click="currentTab = 'home'" :class="['w-full text-left px-4 py-3 rounded-xl font-medium text-sm flex items-center space-x-3 transition-all', currentTab === 'home' ? 'bg-emerald-500 text-slate-950 font-bold shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-white']">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span>Beranda Utama</span>
+                </button>
+
+                <button v-for="(mission, index) in missions" :key="index" @click="currentTab = index + 1" :class="['w-full text-left px-4 py-3 rounded-xl font-medium text-sm flex items-center justify-between transition-all', currentTab === index + 1 ? 'bg-emerald-500 text-slate-950 font-bold shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-white']">
+                    <div class="flex items-center space-x-3 truncate">
+                        <span class="text-xs font-extrabold px-2 py-0.5 rounded bg-slate-800/60 text-slate-300">Misi {{ index + 1 }}</span>
+                        <span class="truncate">{{ mission.title }}</span>
+                    </div>
+                    <i v-if="missionProgress[index]" data-lucide="check-circle-2" class="w-4 h-4 text-emerald-300 shrink-0"></i>
+                </button>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 bg-slate-900/50 p-8 overflow-y-auto">
+                <!-- HOME TAB -->
+                <div v-if="currentTab === 'home'" class="max-w-4xl mx-auto space-y-8">
+                    <div class="bg-gradient-to-r from-emerald-600/20 via-slate-800 to-indigo-900/20 border border-slate-700/60 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
+                        <div class="relative z-10 space-y-4">
+                            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold px-3 py-1 rounded-full">KURIKULUM MERDEKA • KELAS VIII</span>
+                            <h2 class="text-3xl font-extrabold text-white">Misi Menjadi Ahli Analisis Data Bersama Excel</h2>
+                            <p class="text-slate-300 max-w-2xl leading-relaxed text-sm">
+                                Selamat datang, Calon Data Analyst! Pelajari cara mengolah data, menggunakan rumus otomatis seperti SUM, AVERAGE, MIN, MAX, hingga fungsi logika IF untuk memecahkan kasus nyata di kantin sekolah.
+                            </p>
+                            <button @click="currentTab = 1" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-3 rounded-2xl shadow-lg transition-all flex items-center space-x-2">
+                                <span>Mulai Petualangan Sekarang</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Badges Grid -->
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-white text-lg">Koleksi Lencana (Badges)</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div v-for="(badge, bIdx) in badges" :key="bIdx" :class="['p-4 rounded-2xl border flex flex-col items-center text-center space-y-2 transition-all', badge.unlocked ? 'bg-slate-800/80 border-emerald-500/40 text-white shadow-md' : 'bg-slate-950/40 border-slate-800 text-slate-600 opacity-60']">
+                                <div :class="['p-3 rounded-xl', badge.unlocked ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-900 text-slate-700']">
+                                    <i :data-lucide="badge.icon" class="w-6 h-6"></i>
+                                </div>
+                                <span class="font-bold text-xs">{{ badge.name }}</span>
+                                <span class="text-[10px] text-slate-400">{{ badge.desc }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MISSION 1: MENGENAL ANALISIS DATA -->
+                <div v-if="currentTab === 1" class="max-w-4xl mx-auto space-y-6">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-3xl space-y-4">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Misi 1 dari 7</span>
+                        <h2 class="text-2xl font-bold text-white">Mengenal Analisis Data & Microsoft Excel</h2>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Analisis data adalah proses mengumpulkan, membersihkan, dan mengolah data agar menghasilkan informasi yang berguna untuk mengambil keputusan. Di tingkat SMP, kita sering menemui data kualitatif (deskripsi seperti hobi, warna) dan kuantitatif (angka seperti nilai ulangan, tinggi badan).
+                        </p>
+                        
+                        <div class="p-4 bg-slate-900/80 rounded-2xl border border-slate-700 space-y-3">
+                            <h4 class="font-bold text-white text-sm">Simulasi Tantangan Sel Aktif:</h4>
+                            <p class="text-xs text-slate-300">Ketik kata <code class="bg-slate-800 px-1.5 py-0.5 rounded text-emerald-400">Nama</code> pada sel A1 di bawah ini untuk menyelesaikan misi pertama!</p>
+                            
+                            <!-- Mini Spreadsheet Simulator -->
+                            <div class="border border-slate-700 rounded-xl overflow-hidden bg-slate-950">
+                                <div class="bg-slate-900 px-3 py-2 border-b border-slate-800 flex items-center space-x-2 text-xs font-mono text-slate-400">
+                                    <span class="bg-slate-800 px-2 py-0.5 rounded text-emerald-400 font-bold">A1</span>
+                                    <span>Isi: {{ sheetData['A1'] || '(kosong)' }}</span>
+                                </div>
+                                <table class="w-full text-left border-collapse text-sm">
+                                    <thead>
+                                        <tr class="bg-slate-900/80 border-b border-slate-800 text-xs text-slate-400">
+                                            <th class="p-2 border-r border-slate-800 w-12 text-center">#</th>
+                                            <th class="p-2 border-r border-slate-800 font-mono">A</th>
+                                            <th class="p-2 font-mono">B</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-slate-800">
+                                            <td class="p-2 text-center text-xs font-mono bg-slate-950 border-r border-slate-800 text-slate-500">1</td>
+                                            <td class="p-2 border-r border-slate-800">
+                                                <input v-model="sheetData['A1']" type="text" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white text-xs focus:outline-none focus:border-emerald-500" placeholder="Ketik 'Nama'">
+                                            </td>
+                                            <td class="p-2">
+                                                <input v-model="sheetData['B1']" type="text" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white text-xs focus:outline-none focus:border-emerald-500" placeholder="Ketik 'Nilai'">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button @click="completeMission(1)" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl">
+                                Selesaikan Misi 1 (+50 XP)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MISSION 2: MENYIMPAN DAN MEMFILTER DATA -->
+                <div v-if="currentTab === 2" class="max-w-4xl mx-auto space-y-6">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-3xl space-y-4">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Misi 2 dari 7</span>
+                        <h2 class="text-2xl font-bold text-white">Menyimpan dan Memfilter Data Penjualan</h2>
+                        <p class="text-slate-300 text-sm">
+                            Tabel di bawah ini berisi daftar barang di koperasi sekolah. Total dihitung otomatis dari <code class="bg-slate-900 px-1 py-0.5 rounded text-emerald-400">Jumlah × Harga</code>.
+                        </p>
+
+                        <!-- Sales Table -->
+                        <div class="border border-slate-700 rounded-2xl overflow-hidden bg-slate-950">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-slate-900 border-b border-slate-800 text-xs text-slate-400">
+                                        <th class="p-3">No</th>
+                                        <th class="p-3">Nama Barang</th>
+                                        <th class="p-3">Jumlah</th>
+                                        <th class="p-3">Harga (Rp)</th>
+                                        <th class="p-3">Total (Rp)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in salesData" :key="item.no" class="border-b border-slate-800/60 hover:bg-slate-900/40">
+                                        <td class="p-3 text-slate-400 text-xs">{{ item.no }}</td>
+                                        <td class="p-3 font-semibold text-white">{{ item.name }}</td>
+                                        <td class="p-3">{{ item.qty }}</td>
+                                        <td class="p-3">Rp {{ item.price.toLocaleString() }}</td>
+                                        <td class="p-3 text-emerald-400 font-bold">Rp {{ (item.qty * item.price).toLocaleString() }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button @click="completeMission(2)" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl">
+                            Selesaikan Misi 2 (+50 XP)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MISSION 3: EXCEL SEBAGAI KALKULATOR -->
+                <div v-if="currentTab === 3" class="max-w-4xl mx-auto space-y-6">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-3xl space-y-4">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Misi 3 dari 7</span>
+                        <h2 class="text-2xl font-bold text-white">Excel sebagai Kalkulator</h2>
+                        <p class="text-slate-300 text-sm">Rumus di Excel selalu diawali dengan tanda sama dengan (<code class="bg-slate-900 px-1.5 py-0.5 rounded text-emerald-400">=</code>).</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-900/80 p-6 rounded-2xl border border-slate-700">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">Angka Pertama</label>
+                                <input v-model.number="calcA" type="number" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">Operator Hitung</label>
+                                <select v-model="calcOp" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono">
+                                    <option value="+">Tambah (+)</option>
+                                    <option value="-">Kurang (-)</option>
+                                    <option value="*">Kali (×)</option>
+                                    <option value="/">Bagi (÷)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">Angka Kedua</label>
+                                <input v-model.number="calcB" type="number" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <div class="text-xs text-slate-400">Hasil Perhitungan:</div>
+                                <div class="text-2xl font-extrabold text-emerald-400 font-mono">{{ calculatedResult }}</div>
+                            </div>
+                            <button @click="completeMission(3)" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl">
+                                Selesaikan Misi 3 (+50 XP)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MISSION 4: FUNGSI SUM -->
+                <div v-if="currentTab === 4" class="max-w-4xl mx-auto space-y-6">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-3xl space-y-4">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Misi 4 dari 7</span>
+                        <h2 class="text-2xl font-bold text-white">Fungsi SUM untuk Penjumlahan Cepat</h2>
+                        <p class="text-slate-300 text-sm">Alih-alih mengetik <code class="bg-slate-900 px-1 py-0.5 rounded text-emerald-400">=A1+A2+A3+A4+A5</code>, gunakan <code class="bg-slate-900 px-1 py-0.5 rounded text-emerald-400">=SUM(A1:A5)</code>.</p>
+                        <button @click="completeMission(4)" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl">
+                            Selesaikan Misi 4 (+50 XP)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MISSION 5: AVERAGE, MIN, MAX -->
+                <div v-if="currentTab === 5" class="max-w-4xl mx-auto space-y-6">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-3xl space-y-4">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Misi 5 dari 7</span>
+                        <h2 class="text-2xl font-bold text-white">Fungsi AVERAGE, MIN, dan MAX</h2>
+                        <p class="text-slate-300 text-sm">Gunakan <code class="bg-slate-900 px-1 py-0.5 rounded text-emerald-400">=AVERAGE()</code> untuk rata-rata, <code class="bg-slate-900 px-1 py-0.5 rounded text-emerald-400">=MIN()</code> untuk nilai terkecil, dan <code class="bg-slate-900 px-1 py-0.5 rounded text-emerald-400">=MAX()</code> untuk nilai terbesar.</p>
+                        <button @click="completeMission(5)" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl">
+                            Selesaikan Misi 5 (+50 XP)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MISSION 6: FUNGSI IF -->
+                <div v-if="currentTab === 6" class="max-w-4xl mx-auto space-y-6">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-3xl space-y-4">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Misi 6 dari 7</span>
+                        <h2 class="text-2xl font-bold text-white">Fungsi Logika IF</h2>
+                        <p class="text-slate-300 text-sm">Contoh: <code class="bg-slate-900 px-1.5 py-0.5 rounded text-emerald-400">=IF(B2>=75, "Lulus", "Belum Lulus")</code> untuk menentukan kelulusan siswa.</p>
+                        <button @click="completeMission(6)" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl">
+                            Selesaikan Misi 6 (+50 XP)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MISSION 7: FINAL CHALLENGE -->
+                <div v-if="currentTab === 7" class="max-w-4xl mx-auto space-y-6">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-3xl space-y-4">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Misi Akhir</span>
+                        <h2 class="text-2xl font-bold text-white">Final Challenge: Pengelola Kantin Sekolah</h2>
+                        <p class="text-slate-300 text-sm">Selesaikan proyek akhir analisis data kantin sekolah untuk mendapatkan lencana utama dan sertifikat kelulusan!</p>
+                        <button @click="completeMission(7)" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl">
+                            Selesaikan Final Challenge (+100 XP)
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const currentTab = ref('home');
+                const totalPoints = ref(parseInt(localStorage.getItem('eda_points') || '0'));
+                const missionProgress = ref(JSON.parse(localStorage.getItem('eda_progress') || '[false, false, false, false, false, false, false]'));
+                
+                const missions = [
+                    { title: "Mengenal Analisis Data" },
+                    { title: "Menyimpan & Memfilter Data" },
+                    { title: "Excel sebagai Kalkulator" },
+                    { title: "Fungsi SUM" },
+                    { title: "Fungsi AVERAGE, MIN, MAX" },
+                    { title: "Fungsi IF" },
+                    { title: "Final Challenge" }
+                ];
+
+                const badges = ref([
+                    { name: "Data Explorer", desc: "Selesaikan Misi 1", icon: "compass", unlocked: false },
+                    { name: "Excel Beginner", desc: "Selesaikan Misi 2 & 3", icon: "file-spreadsheet", unlocked: false },
+                    { name: "Formula Master", desc: "Selesaikan Misi 4 & 5", icon: "calculator", unlocked: false },
+                    { name: "Data Analyst", desc: "Selesaikan Misi 6", icon: "bar-chart-3", unlocked: false },
+                    { name: "Excel Champion", desc: "Selesaikan Final Challenge", icon: "award", unlocked: false }
+                ]);
+
+                const currentLevel = computed(() => Math.floor(totalPoints.value / 100) + 1);
+
+                const sheetData = ref({ A1: '', B1: '' });
+                const calcA = ref(10);
+                const calcB = ref(5);
+                const calcOp = ref('+');
+
+                const calculatedResult = computed(() => {
+                    if (calcOp.value === '+') return calcA.value + calcB.value;
+                    if (calcOp.value === '-') return calcA.value - calcB.value;
+                    if (calcOp.value === '*') return calcA.value * calcB.value;
+                    if (calcOp.value === '/') return calcB.value !== 0 ? (calcA.value / calcB.value).toFixed(2) : 'Error (Div/0)';
+                    return 0;
+                });
+
+                const salesData = ref([
+                    { no: 1, name: 'Buku Tulis', qty: 5, price: 5000 },
+                    { no: 2, name: 'Pulpen', qty: 10, price: 3000 },
+                    { no: 3, name: 'Pensil', qty: 8, price: 2500 }
+                ]);
+
+                const completeMission = (missionNum) => {
+                    const idx = missionNum - 1;
+                    if (!missionProgress.value[idx]) {
+                        missionProgress.value[idx] = true;
+                        totalPoints.value += (missionNum === 7 ? 100 : 50);
+                        
+                        // Unlock badges logic
+                        if (missionNum >= 1) badges.value[0].unlocked = true;
+                        if (missionNum >= 3) badges.value[1].unlocked = true;
+                        if (missionNum >= 5) badges.value[2].unlocked = true;
+                        if (missionNum >= 6) badges.value[3].unlocked = true;
+                        if (missionNum === 7) badges.value[4].unlocked = true;
+
+                        localStorage.setItem('eda_points', totalPoints.value);
+                        localStorage.setItem('eda_progress', JSON.stringify(missionProgress.value));
+                        alert(`Hebat! Misi ${missionNum} selesai! Poin Anda bertambah.`);
+                    }
+                };
+
+                onMounted(() => {
+                    lucide.createIcons();
+                    // Restore badge unlock status based on progress
+                    if (missionProgress.value[0]) badges.value[0].unlocked = true;
+                    if (missionProgress.value[2]) badges.value[1].unlocked = true;
+                    if (missionProgress.value[4]) badges.value[2].unlocked = true;
+                    if (missionProgress.value[5]) badges.value[3].unlocked = true;
+                    if (missionProgress.value[6]) badges.value[4].unlocked = true;
+                });
+
+                return {
+                    currentTab,
+                    totalPoints,
+                    currentLevel,
+                    missions,
+                    badges,
+                    missionProgress,
+                    sheetData,
+                    calcA,
+                    calcB,
+                    calcOp,
+                    calculatedResult,
+                    salesData,
+                    completeMission
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
